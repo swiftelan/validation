@@ -7,9 +7,9 @@
 	<artifactId>runtime-validation</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Runtime Validation</name>
+	<name>Runtime Validation Provider</name>
 	<url>https://github.com/swiftelan/validation</url>
-	<description>Project demonstrating runtime configuration of the javax.validation APIs</description>
+	<description>Runtime ValidationProvider using Hibernate Validaor's programatic API</description>
 	<inceptionYear>2014</inceptionYear>
 
 	<licenses>

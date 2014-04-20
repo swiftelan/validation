@@ -10,4 +10,6 @@ public class TestObject {
 	String notNullRuntime;
 
 	String allowNull;
+
+	String size;
 }

@@ -2,7 +2,9 @@ package com.swiftelan.validation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -20,6 +22,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
+import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 
@@ -43,13 +46,19 @@ public class RuntimeValidationProvider implements ValidationProvider<HibernateVa
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 		ServiceLoader<PropertyConfigurationProvider> loader = ServiceLoader.load(PropertyConfigurationProvider.class);
 		Iterator<PropertyConfigurationProvider> iterator = loader.iterator();
+		Map<Class<?>, TypeConstraintMappingContext<?>> typeConstraints = new HashMap<>();
 		while (iterator.hasNext()) {
 			PropertyConfigurationProvider provider = iterator.next();
 			Set<PropertyConfiguration> propertyConfigurations = provider.getPropertyConfigurations();
 			if (propertyConfigurations != null) {
 				for (PropertyConfiguration config : propertyConfigurations) {
-					PropertyConstraintMappingContext propertyConstraint = constraintMapping.type(config.getClazz())
-							.property(config.getPropertyName(), ElementType.FIELD);
+					TypeConstraintMappingContext<?> typeContext = typeConstraints.get(config.getClazz());
+					if (typeContext == null) {
+						typeContext = constraintMapping.type(config.getClazz());
+						typeConstraints.put(config.getClazz(), typeContext);
+					}
+					PropertyConstraintMappingContext propertyConstraint = typeContext.property(config.getPropertyName(),
+							ElementType.FIELD);
 					propertyConstraint.ignoreAnnotations();
 					if (config.isRequired()) {
 						propertyConstraint.constraint(new NotNullDef());
@@ -65,10 +74,11 @@ public class RuntimeValidationProvider implements ValidationProvider<HibernateVa
 					if (config.getMin() != null || config.getMax() != null) {
 						propertyConstraint.constraint(s);
 					}
-					configuration.addMapping(constraintMapping);
+
 				}
 			}
 		}
+		configuration.addMapping(constraintMapping);
 	}
 
 	@SuppressWarnings("unchecked")

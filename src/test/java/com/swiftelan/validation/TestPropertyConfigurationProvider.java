@@ -15,6 +15,21 @@ public class TestPropertyConfigurationProvider implements PropertyConfigurationP
 		notNullAtRuntime.setClazz(TestObject.class);
 		notNullAtRuntime.setPropertyName("notNullRuntime");
 		properties.add(notNullAtRuntime);
+
+		PropertyConfiguration allowNull = new PropertyConfiguration();
+		allowNull.setRequired(true);
+		allowNull.setClazz(TestObject.class);
+		allowNull.setPropertyName("allowNull");
+		properties.add(allowNull);
+
+		PropertyConfiguration size = new PropertyConfiguration();
+		size.setRequired(false);
+		size.setClazz(TestObject.class);
+		size.setPropertyName("size");
+		size.setMin(Integer.valueOf(5));
+		size.setMax(Integer.valueOf(10));
+		properties.add(size);
+
 		return properties;
 	}
 

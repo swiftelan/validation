@@ -47,4 +47,34 @@ public class RuntimeValidationProviderTest {
 				"something");
 		Assert.assertTrue(violations.isEmpty());
 	}
+
+	@Test
+	public void allowNullOverride() {
+		Set<ConstraintViolation<TestObject>> violations = validator.validateValue(TestObject.class, "allowNull", null);
+		Assert.assertFalse(violations.isEmpty());
+	}
+
+	@Test
+	public void sizeMinNotMet() {
+		Set<ConstraintViolation<TestObject>> violations = validator.validateValue(TestObject.class, "size", "one");
+		Assert.assertFalse(violations.isEmpty());
+	}
+
+	@Test
+	public void sizeMin() {
+		Set<ConstraintViolation<TestObject>> violations = validator.validateValue(TestObject.class, "size", "fives");
+		Assert.assertTrue(violations.isEmpty());
+	}
+
+	@Test
+	public void sizeMax() {
+		Set<ConstraintViolation<TestObject>> violations = validator.validateValue(TestObject.class, "size", "0123456789");
+		Assert.assertTrue(violations.isEmpty());
+	}
+
+	@Test
+	public void sizeMaxNotMet() {
+		Set<ConstraintViolation<TestObject>> violations = validator.validateValue(TestObject.class, "size", "01234567890");
+		Assert.assertFalse(violations.isEmpty());
+	}
 }
